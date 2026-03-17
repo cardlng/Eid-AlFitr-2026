@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oman LNG Eid Card</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f7f7f7;
+      margin: 0;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 300px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #006c8c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    /* Scaled down container for mobile view while keeping aspect ratio */
+    #cardWrapper {
+      width: 100%;
+      max-width: 768px;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+    #card {
+      width: 768px;
+      height: 960px;
+      position: relative;
+      background-image: url('eid-card.png');
+      background-size: cover;
+      background-position: center;
+      /* CSS transform allows the large card to scale down visually on small screens */
+      transform-origin: top center; 
+    }
+    #nameOverlay {
+      position: absolute;
+      top: 345px; /* Adjust this to match where the name should sit on your background */
+      width: 100%;
+      text-align: center;
+      font-size: 36px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    @media (max-width: 800px) {
+      #card {
+        transform: scale(0.45); 
+        margin-bottom: -500px; 
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎉 Oman LNG Eid Card Generator</h2>
+  <p>Enter your name below (Arabic or English)</p>
+  <input type="text" id="nameInput" placeholder="Enter your name">
+  <br>
+  <button onclick="generateCard()">Generate Card</button>
+
+  <div id="cardWrapper">
+    <div id="card">
+      <div id="nameOverlay">Your Name</div>
+    </div>
+  </div>
+
+  <script>
+    function generateCard() {
+      const name = document.getElementById("nameInput").value.trim();
+      if (!name) {
+        alert("Please enter a name.");
+        return;
+      }
+
+      document.getElementById("nameOverlay").innerText = name;
+      
+      const btn = document.querySelector("button");
+      btn.innerText = "Generating...";
+      btn.disabled = true;
+
+      // Temporarily remove scaling before capture so html2canvas renders full resolution
+      const card = document.getElementById("card");
+      card.style.transform = "none";
+
+      html2canvas(card, { useCORS: true, scale: 2 }).then(canvas => {
+        // Convert the canvas to a Blob for reliable mobile downloading
+        canvas.toBlob(function(blob) {
+          const downloadUrl = URL.createObjectURL(blob);
+          const imageData = canvas.toDataURL("image/png");
+
+          // Create the final flattened image to display on screen
+          const resultImg = document.createElement("img");
+          resultImg.src = imageData;
+          resultImg.style.width = "100%";
+          resultImg.style.maxWidth = "500px";
+          resultImg.style.marginTop = "20px";
+          resultImg.style.borderRadius = "8px";
+          resultImg.style.boxShadow = "0px 4px 12px rgba(0,0,0,0.15)";
+
+          // Clear the page and display the new UI
+          document.body.innerHTML = `
+            <h2>🎉 Your Card is Ready!</h2>
+            <p style="font-size: 16px; color: #555;">Tap the button below to save your card.</p>
+          `;
+          
+          document.body.appendChild(resultImg);
+
+          // 1. Create the dedicated Download Button
+          const downloadBtn = document.createElement("button");
+          downloadBtn.innerText = "⬇️ Download Image";
+          downloadBtn.style.display = "block";
+          downloadBtn.style.margin = "25px auto 10px auto";
+          downloadBtn.style.backgroundColor = "#28a745"; // Green to indicate success/action
+          downloadBtn.style.padding = "15px 30px";
+          downloadBtn.style.fontSize = "18px";
+          downloadBtn.onclick = () => {
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = "Oman-LNG-Eid-Card-" + name + ".png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          };
+          document.body.appendChild(downloadBtn);
+
+          // 2. Add a button to start over
+          const reloadBtn = document.createElement("button");
+          reloadBtn.innerText = "Create Another Card";
+          reloadBtn.style.display = "block";
+          reloadBtn.style.margin = "15px auto";
+          reloadBtn.style.backgroundColor = "#006c8c";
+          reloadBtn.onclick = () => window.location.reload();
+          document.body.appendChild(reloadBtn);
+
+        }, "image/png");
+        
+      }).catch(err => {
+        alert("Oops! Something went wrong generating the card.");
+        console.error(err);
+        btn.innerText = "Generate Card";
+        btn.disabled = false;
+        card.style.transform = ""; 
+      });
+    }
+  </script>
+
+</body>
+</html>
