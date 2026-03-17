@@ -43,15 +43,19 @@
       max-width: 768px;
       margin: 20px auto;
       overflow: hidden;
+      /* Add these to perfectly center the oversized card on mobile */
+      display: flex;
+      justify-content: center; 
     }
     #card {
       width: 768px;
       height: 960px;
+      /* Add this so the browser doesn't try to squish the box */
+      flex-shrink: 0; 
       position: relative;
       background-image: url('eid-card.png');
       background-size: cover;
       background-position: center;
-      /* CSS transform allows the large card to scale down visually on small screens */
       transform-origin: top center; 
     }
     #nameOverlay {
